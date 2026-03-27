@@ -1,0 +1,74 @@
+{
+    "Simple": {
+        "gemma-3-12b": {
+            "model_name": "Gemma 3 12B",
+            "model_id": "google/gemma-3-12b-it",
+            "type": "Dense",
+            "context_window": 128000 
+        },
+        "qwen2.5-7b": {
+            "model_name": "Qwen 2.5 7B",
+            "model_id": "Qwen/Qwen2.5-7B-Instruct",
+            "type": "Dense",
+            "context_window": 32768
+        },
+        "GraphWiz-llama2-7b": {
+            "model_name": "GraphWiz llama2 7B",
+            "model_id": "GraphWiz/LLaMA2-7B",
+            "type": "Dense",
+            "context_window": 4096
+        },
+        "GraphWiz-mistral-7b": {
+            "model_name": "GraphWiz mistral 7B",
+            "model_id": "GraphWiz/Mistral-7B",
+            "type": "Dense",
+            "context_window": 8192
+        },
+        "GraphWiz-llama2-13b": {
+            "model_name": "GraphWiz llama 13B",
+            "model_id": "GraphWiz/LLaMA2-13B",
+            "type": "Dense",
+            "context_window": 8192
+        }
+        
+    },
+    "Advanced": {
+        "deepseek-r1": {
+            "model_name": "DeepSeek R1",
+            "model_id": "deepseek-ai/DeepSeek-R1",
+            "type": "Thinking (Reasoning)",
+            "context_window": 128000
+        },
+        "deepseek-r1-distill-70b": {
+            "model_name": "DeepSeek R1 Distill Llama 70B",
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+            "type": "Thinking (Reasoning)",
+            "context_window": 128000
+        },
+        "qwq-32b": {
+            "model_name": "Qwen QwQ 32B",
+            "model_id": "Qwen/QwQ-32B-Preview",
+            "type": "Thinking (Reasoning)",
+            "context_window": 32768
+        },
+        "llama-4-Maverick-17B": {
+            "model_name": "Llama 4 Maverick 17B",
+            "model_id": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+            "type": "MoE (Mixture of Experts)",
+            "context_window": 1000000
+        },
+        "mixtral-8x7b": {
+            "model_name": "Mixtral 8x7B",
+            "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+            "type": "MoE (Mixture of Experts)",
+            "context_window": 32768
+        },
+        "mixtral-8x22b": {
+            "model_name": "Mixtral 8x22B",
+            "model_id": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+            "type": "MoE (Mixture of Experts)",
+            "context_window": 65536
+        }
+
+    }
+}
