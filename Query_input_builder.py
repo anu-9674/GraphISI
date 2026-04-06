@@ -11,13 +11,21 @@ import numpy as np
 import os 
 import json
 from networkx.readwrite import json_graph
+from collections import defaultdict
 from ALGORITHM_CONFIG import ALGORITHM_CONFIG, is_weighted, is_directed
+from pathlib import Path
+
+Path("Output").mkdir(exist_ok=True)
+
+
 
 data_id=1
 
 class QueryInputBuilder:
 
     def __init__(self,algorithm,algorithm_type,k_shot=0):
+
+        Path(self.algorithm_name).mkdir(exist_ok=True)
 
         self.graph_file_path="Data/graphs.json"
         self.bipartite_graph_file="Data/bipartite_graphs.json"
@@ -118,7 +126,7 @@ class QueryInputBuilder:
               self.read_graphs_for_query_graphs()  
     
 
-    def read_graphs_for_output_file(self):
+    def read_graphs_for_output_graphs(self):
         data_id=1
         graphs_list = dict({})
         output_results={str(num_nodes): {} for num_nodes in range(5,31)}
@@ -138,18 +146,46 @@ class QueryInputBuilder:
                     for directed_configuration in directed_configurations:
                         graphs=graphs_list[num_nodes][is_weighted[weighted_configuration]][is_directed[directed_configuration]]
                         for graph in graphs:
-                            if self.algorithm_name == 'havel_hakimi':
-                                data = self.query_input_builder(HavelHakimiAlgorithm.give_degree_sequence(json_graph.node_link_graph(graph)))
-                            else:
                                 data = self.query_input_builder(json_graph.node_link_graph(graph))
                                 result[is_weighted[weighted_configuration]][is_directed[directed_configuration]]['input'][data_id]=data['query_input']
                                 data_id+=1
             output_results[num_nodes]=result
         with open(self.output_filepath, "w") as f:
             json.dump(output_results, f, indent=4)
+    
+    def read_graphs_for_output_sequences(self):
+        data_id=1
+        graphs_list = dict({})
+        output_results={str(num_nodes): {} for num_nodes in range(5,31)}
 
-#obj=QueryInputBuilder('havel_hakimi','deterministic',0)
-#obj.run_read_graphs()
+        generator_configurations=self.config["generator_configurations"]
+        weighted_configurations=generator_configurations['weighted']
+        directed_configurations=generator_configurations['directed']
+
+        with open(self.graph_file_path) as f:
+                graphs_list = json.load(f)
+        for num_nodes in graphs_list:
+            recursive_dict = lambda: defaultdict(recursive_dict)
+            result = recursive_dict()
+            for weighted_configuration in weighted_configurations:
+                    for directed_configuration in directed_configurations:
+                        graphs=graphs_list[num_nodes][is_weighted[weighted_configuration]][is_directed[directed_configuration]]
+                        for graph in graphs:
+                                data = self.query_input_builder(HavelHakimiAlgorithm.give_degree_sequence(json_graph.node_link_graph(graph)))
+                                result['input'][data_id]=data['query_input']
+                                data_id+=1
+            output_results[num_nodes]=result
+        with open(self.output_filepath, "w") as f:
+            json.dump(output_results, f, indent=4)
+    
+    def read_graphs_for_output(self):
+          if self.algorithm_name=='havel_hakimi':
+                self.read_graphs_for_output_sequences()
+          else:
+                self.read_graphs_for_output_graphs()
+
+obj=QueryInputBuilder('havel_hakimi','deterministic',0)
+obj.run_read_graphs()
         
 
 
