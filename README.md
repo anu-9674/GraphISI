@@ -1,3 +1,4 @@
+## Steps to work with the code
 1. Run file run.py to create all necessary folder and files
 
 2.To build the dataset run the main.py code with the arguments like this : 
