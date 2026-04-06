@@ -6,6 +6,8 @@ import json
 import os
 import numpy as np
 from collections import defaultdict
+from pathlib import Path
+Path("examples_dataset").mkdir(exist_ok=True)
 
 from graph_encoder import weighted_graph_encoder, unweighted_graph_encoder
 import graph_generators
@@ -125,8 +127,7 @@ class FileBuilder:
         config = self.ALGORITHM_CONFIG[self.algorithm]
         global example_id
 
-        recursive_dict = lambda: defaultdict(recursive_dict)
-        results = recursive_dict()
+        c
 
         algorithm = config['class']
         input_type = config['input_type']
