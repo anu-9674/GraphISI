@@ -182,8 +182,19 @@ class QueryInputBuilder:
           else:
                 self.read_graphs_for_output_graphs()
 
-# obj=QueryInputBuilder('havel_hakimi','deterministic',0)
-# obj.run_read_graphs()
+def main(args=None):
+    """Main fucntion to run the file builder class"""
+    algorithms={"deterministic":["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]}
+    for algorithm_type in algorithms:
+        for algorithm in algorithms[algorithm_type]:
+            query_obj=QueryInputBuilder(algorithm_type,algorithm)
+            query_obj.run_read_graphs()
+
+            query_obj=QueryInputBuilder(algorithm_type,algorithm,1)
+            query_obj.read_graphs_for_output()
+
+if __name__ == "__main__":
+    main()
         
 
 
