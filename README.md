@@ -1,16 +1,6 @@
-1.Create the graphs and the bipartite graphs dataset by running the graph_generator.py code
+1. Run file run.py to create all necessary folder and files
 
-python graph_generator.py
-
-2.Generate the in_context learning dataset by running the in_context_learning_examples.py code for that particular algorithm for example ,bfs.
-
-python in_context_learning_examples.py
-
-3.Generate the query file which contains the encoded inputs and the corresponding ground truth by running the file read_graphs function in Query_input_builder.py for the same algorithm as above
-
-4.Generate the k_json file by running the Query_input_builder.py file 
-
-5.To build the dataset run the main.py code with the arguments like this : 
+2.To build the dataset run the main.py code with the arguments like this : 
 
 python main.py \
   --algorithm_type deterministic \
