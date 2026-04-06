@@ -8,6 +8,7 @@ import json
 import random
 import networkx as nx
 from networkx.readwrite import json_graph
+
 from pathlib import Path
 Path("Data").mkdir(exist_ok=True)
 
@@ -19,7 +20,6 @@ def random_spanning_tree(n):
     for i in range(1, n):
         G.add_edge(perm[i], perm[random.randint(0, i - 1)])
     return G
-
 
 def random_hamiltonian_cycle(n):
     perm = list(range(n))
