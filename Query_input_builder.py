@@ -184,8 +184,8 @@ class QueryInputBuilder:
           else:
                 self.read_graphs_for_output_graphs()
 
-obj=QueryInputBuilder('havel_hakimi','deterministic',0)
-obj.run_read_graphs()
+# obj=QueryInputBuilder('havel_hakimi','deterministic',0)
+# obj.run_read_graphs()
         
 
 
