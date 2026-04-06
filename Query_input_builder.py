@@ -13,11 +13,9 @@ import json
 from networkx.readwrite import json_graph
 from collections import defaultdict
 from ALGORITHM_CONFIG import ALGORITHM_CONFIG, is_weighted, is_directed
+
 from pathlib import Path
-
 Path("Output").mkdir(exist_ok=True)
-
-
 
 data_id=1
 
