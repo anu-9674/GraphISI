@@ -8,7 +8,8 @@ import json
 import random
 import networkx as nx
 from networkx.readwrite import json_graph
-
+from pathlib import Path
+Path("Data").mkdir(exist_ok=True)
 
 def random_spanning_tree(n):
     perm = list(range(n))
@@ -137,10 +138,10 @@ def generate_bipartite(n,count=20,seed_base=0):
 
     
 def main():
-    # data = {str(n): generate(n, seed_base=n * 1000) for n in range(5, 31)}
-    # with open("./Data/graphs.json", "w") as f:
-    #     json.dump(data, f, indent=2)
-    # print(f"Saved graphs.json - {26 * 4 * 20} graphs total")
+    data = {str(n): generate(n, seed_base=n * 1000) for n in range(5, 31)}
+    with open("./Data/graphs.json", "w") as f:
+        json.dump(data, f, indent=2)
+    print(f"Saved graphs.json - {26 * 4 * 20} graphs total")
 
     data={str(n): generate_bipartite(n,seed_base=n*1000) for n in range(5,31)}
     with open("./Data/bipartite_graphs.json", "w") as f:
