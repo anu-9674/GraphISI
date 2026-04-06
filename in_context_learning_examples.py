@@ -180,8 +180,10 @@ class FileBuilder:
 
 def main(args=None):
     """Main fucntion to run the file builder class"""
-    fileBuilder_obj=FileBuilder('havel_hakimi')
-    fileBuilder_obj.run()
+    algorithms=["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]
+    for algorithm in algorithms:
+        fileBuilder_obj=FileBuilder(algorithm)
+        fileBuilder_obj.run()
 
 if __name__ == "__main__":
     main()
