@@ -184,9 +184,11 @@ class FileBuilder:
 def main(args=None):
     """Main fucntion to run the file builder class"""
     algorithms=["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]
+    print("Generating samples for in-context learning..")
     for algorithm in algorithms:
         fileBuilder_obj=FileBuilder(algorithm)
         fileBuilder_obj.run()
+        print(f"Saved in_context learning examples for {algorithm} algorithm")
 
 if __name__ == "__main__":
     main()
