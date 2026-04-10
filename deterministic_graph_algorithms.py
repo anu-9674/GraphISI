@@ -171,7 +171,7 @@ class DijkstraAlgorithm(GraphAlgorithms):
         super().__init__()
 
         self.name = 'Dijkstra_Algorithm'
-        self.task = "Find the shortest distances from a source using the following Algorithm"
+        self.task = "Find the shortest distances from a source using the following Algorithm , always take the source as node 0"
         self.algorithm_steps = '''The steps of the Algorithm for a given graph is as follows: 
             DIJKSTRA(G, w, s)
         1   for each vertex v ∈ G.V
@@ -212,7 +212,7 @@ class DijkstraAlgorithm(GraphAlgorithms):
 
     def dijkstra_shortest_path_algorithm(self, adjacency_list):
 
-        source = random.choice(list(self.Graph.nodes))
+        source = list(self.Graph.nodes)[0]
         pq = []
         dist = [sys.maxsize] * len(self.Graph.nodes)
 
