@@ -16,7 +16,7 @@ from langchain_core.prompts import PromptTemplate
 SEED_VALUE = 0
 set_seed(SEED_VALUE)
 
-
+HuggingFace_token="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"
 
 class LLMManager:
     """Manages multiple HuggingFace LLM models with configurable settings"""
@@ -52,9 +52,9 @@ class LLMManager:
         print(f"Loading model: {model_name} ({model_id})...")
 
         # Load config and tokenizer
-        config = AutoConfig.from_pretrained(model_id)
+        config = AutoConfig.from_pretrained(model_id,token=HuggingFace_token)
         config.max_position_embeddings = context_length
-        tokenizer = AutoTokenizer.from_pretrained(model_id, config=config)
+        tokenizer = AutoTokenizer.from_pretrained(model_id, config=config,token=HuggingFace_token)
 
 
         # Load model
@@ -64,6 +64,7 @@ class LLMManager:
             max_memory=max_memory,
             torch_dtype=dtype,
             low_cpu_mem_usage=True,
+            token=HuggingFace_token,
         )
 
         # Store references
@@ -262,14 +263,14 @@ def prompt_template(
     return prompt
 
 
-# llm_manager = LLMManager()
-# model_cfg={
-#             "model_name": "GraphWiz llama 13B",
-#             "model_id": "GraphWiz/LLaMA2-13B",
-#             "type": "Dense",
-#             "context_window": 4096
-#         }
-# llm_manager.load_model(
-#             model_name=model_cfg["model_name"],
-#             model_id=model_cfg["model_id"],
-#             context_length=model_cfg["context_window"] )
+llm_manager = LLMManager()
+model_cfg={
+            "model_name": "Gemma 3 12B",
+            "model_id": "google/gemma-3-12b-it",
+            "type": "Dense",
+            "context_window": 128000 
+        }
+llm_manager.load_model(
+            model_name=model_cfg["model_name"],
+            model_id=model_cfg["model_id"],
+            context_length=model_cfg["context_window"] )
