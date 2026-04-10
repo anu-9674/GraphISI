@@ -13,9 +13,11 @@ import json
 from networkx.readwrite import json_graph
 from collections import defaultdict
 from ALGORITHM_CONFIG import ALGORITHM_CONFIG, is_weighted, is_directed
-
 from pathlib import Path
+
 Path("Output").mkdir(exist_ok=True)
+
+
 
 data_id=1
 
@@ -23,7 +25,7 @@ class QueryInputBuilder:
 
     def __init__(self,algorithm,algorithm_type,k_shot=0):
 
-        Path(self.algorithm_name).mkdir(exist_ok=True)
+        Path(f"Output/{algorithm}").mkdir(exist_ok=True)
 
         self.graph_file_path="Data/graphs.json"
         self.bipartite_graph_file="Data/bipartite_graphs.json"
@@ -38,6 +40,7 @@ class QueryInputBuilder:
         self.query_input_filepath=f"Output/{self.algorithm_name}/{self.algorithm_name}_query_inputs.json"
         self.output_filepath=self.output_file = f"Dataset/{self.algorithm_name}_{k_shot}_.json"
 
+        Path(self.query_input_filepath).touch(exist_ok=True)
     
     def query_input_builder(self,query_input):
         """Builds the query input file by keeping record of the query input and the 
@@ -181,7 +184,7 @@ class QueryInputBuilder:
                 self.read_graphs_for_output_sequences()
           else:
                 self.read_graphs_for_output_graphs()
-
+              
 def main(args=None):
     """Main fucntion to run the file builder class"""
     algorithms={"deterministic":["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]}
@@ -191,6 +194,9 @@ def main(args=None):
             query_obj.run_read_graphs()
 
             query_obj=QueryInputBuilder(algorithm_type,algorithm,1)
+            query_obj.read_graphs_for_output()
+
+            query_obj=QueryInputBuilder(algorithm_type,algorithm,2)
             query_obj.read_graphs_for_output()
 
 if __name__ == "__main__":
