@@ -190,19 +190,17 @@ def main(args=None):
     algorithms={"deterministic":["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]}
     for algorithm_type in algorithms:
         for algorithm in algorithms[algorithm_type]:
-            query_obj=QueryInputBuilder(algorithm_type,algorithm)
+            query_obj=QueryInputBuilder(algorithm,algorithm_type,0)
             query_obj.run_read_graphs()
-
-            query_obj=QueryInputBuilder(algorithm_type,algorithm,1)
             query_obj.read_graphs_for_output()
 
-            query_obj=QueryInputBuilder(algorithm_type,algorithm,2)
+            query_obj=QueryInputBuilder(algorithm,algorithm_type,1)
+            query_obj.read_graphs_for_output()
+
+            query_obj=QueryInputBuilder(algorithm,algorithm_type,2)
             query_obj.read_graphs_for_output()
 
 if __name__ == "__main__":
     main()
-        
-
-
                 
 
