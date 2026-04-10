@@ -38,9 +38,10 @@ class QueryInputBuilder:
 
         self.graph_file_path= self.bipartite_graph_file if self.algorithm_name == 'kuhn' or self.algorithm_name=='online_bipartite' else self.graph_file_path
         self.query_input_filepath=f"Output/{self.algorithm_name}/{self.algorithm_name}_query_inputs.json"
-        self.output_filepath=self.output_file = f"Dataset/{self.algorithm_name}_{k_shot}_.json"
+        self.output_filepath=self.output_file = f"Output/{self.algorithm_name}/{self.algorithm_name}_{k_shot}_.json"
 
         Path(self.query_input_filepath).touch(exist_ok=True)
+        Path(self.output_filepath).touch(exist_ok=True)
     
     def query_input_builder(self,query_input):
         """Builds the query input file by keeping record of the query input and the 
@@ -190,6 +191,7 @@ def main(args=None):
     algorithms={"deterministic":["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]}
     for algorithm_type in algorithms:
         for algorithm in algorithms[algorithm_type]:
+            print(f"Generating output files for {algorithm} algorithm....")
             query_obj=QueryInputBuilder(algorithm,algorithm_type,0)
             query_obj.run_read_graphs()
             query_obj.read_graphs_for_output()
@@ -202,5 +204,4 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-                
-
+        
