@@ -6,6 +6,7 @@ import json
 import os
 import numpy as np
 from collections import defaultdict
+
 from pathlib import Path
 Path("examples_dataset").mkdir(exist_ok=True)
 
@@ -77,9 +78,11 @@ class FileBuilder:
                 "encoder": weighted_graph_encoder,
             }
         }
-        node_sizes={"low_node_range":np.arange(3,11).tolist(),"mid_node_range":np.arange(12,21).tolist(),"high_node_range":np.arange(22,30).tolist()}
+        node_sizes={"low_node_range":np.arange(3,12).tolist(),"mid_node_range":np.arange(12,22).tolist(),"high_node_range":np.arange(22,31).tolist()}
         self.GRAPH_SIZES = node_sizes
-        self.filepath = f"{self.algorithm}_data_samples.json"
+        self.filepath = f"examples_dataset/{self.algorithm}_data_samples.json"
+        #create file if it does not exist
+        Path(self.filepath).touch(exist_ok=True)
 
 
     def generate_data(self):
@@ -127,8 +130,9 @@ class FileBuilder:
         config = self.ALGORITHM_CONFIG[self.algorithm]
         global example_id
 
-        c
-
+        recursive_dict = lambda: defaultdict(recursive_dict)
+        results = recursive_dict()
+        
         algorithm = config['class']
         input_type = config['input_type']
         generators = config['graph_generators'] if input_type == 'graph' else config['sequence_generators']
@@ -176,7 +180,6 @@ class FileBuilder:
             self.generate_sequence_data()
         else:
             self.generate_data()
-
 
 def main(args=None):
     """Main fucntion to run the file builder class"""
