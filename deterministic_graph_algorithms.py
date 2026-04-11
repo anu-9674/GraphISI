@@ -212,7 +212,7 @@ class DijkstraAlgorithm(GraphAlgorithms):
 
     def dijkstra_shortest_path_algorithm(self, adjacency_list):
 
-        source = list(self.Graph.nodes)[0]
+        source = 0
         pq = []
         dist = [sys.maxsize] * len(self.Graph.nodes)
 
