@@ -171,7 +171,7 @@ class DijkstraAlgorithm(GraphAlgorithms):
         super().__init__()
 
         self.name = 'Dijkstra_Algorithm'
-        self.task = "Find the shortest distances from a source using the following Algorithm , always take the source as node 0"
+        self.task = "Find the shortest distances from a source using the following Algorithm"
         self.algorithm_steps = '''The steps of the Algorithm for a given graph is as follows: 
             DIJKSTRA(G, w, s)
         1   for each vertex v ∈ G.V
@@ -342,12 +342,12 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
 
         # if the degree is more than the number of nodes then it is not a graphic sequence
         if sum(1 for num in degree_sequence if num > len(degree_sequence) - 1):
-            return 0, self.algorithm_log
+            return 0
 
         # if the number of odd degree nodes are odd then it is not a graphic sequence
         num_odd = sum(1 for num in degree_sequence if num % 2 != 0)
         if num_odd % 2 == 1:
-            return 0, self.algorithm_log
+            return 0
 
         iteration = 1
         # Havel Hakimi algorithm code
@@ -361,7 +361,7 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
             # 2.Check if all the elements are equal to zero it's a graphic sequence
             if all(num == 0 for num in degree_sequence):
                 self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
-                return 1, self.algorithm_log
+                return 1
 
             # 3.Store the first element in a variable and delete it from the sequence
             ele = degree_sequence[0]
@@ -375,7 +375,7 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
             if len(degree_sequence) < ele:
                 iteration_dict['is the sequence length smaller than highest degree ?'] = 'True'
                 self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
-                return 0, self.algorithm_log
+                return 0
             else:
                 iteration_dict['is the sequence length smaller than highest degree?'] = 'False'
 
@@ -390,7 +390,7 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
             if degree_sequence[i] < 0:
                 iteration_dict['is there a negative element'] = 'True'
                 self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
-                return 0, self.algorithm_log
+                return 0
             else:
                 iteration_dict['is there a negative element'] = 'False'
 
