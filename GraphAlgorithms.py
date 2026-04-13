@@ -54,29 +54,37 @@ class GraphAlgorithms:
             if not isinstance(data, list):
                 print('Loaded json file data must be a list')
                 return []
+            data=data[0]
             if num_samples > len(data):
                 print("Warning: Number of samples requested more than what is available")
                 num_samples = len(data)
-
-            data=data[0]
 
             sample_space=[]
             for i in node_count_space[node_count_type]:
                 node_count=int(num_nodes)+i
                 if is_weighted is not None :
                     try:
-                        sample_space.append(random.sample(data[node_count_type][str(node_count)][is_weighted][is_directed],1)[0])
+                        sample_space.extend(data[node_count_type][str(node_count)][is_weighted][is_directed])
                     except KeyError:
                         try:
-                             sample_space.append(random.sample(data["low_node_range"][str(node_count)][is_weighted][is_directed],1)[0])
+                             sample_space.extend(data["low_node_range"][str(node_count)][is_weighted][is_directed])
                         except KeyError:
                             try:
-                                sample_space.append(random.sample(data["mid_node_range"][str(node_count)][is_weighted][is_directed],1)[0])
+                                sample_space.extend(data["mid_node_range"][str(node_count)][is_weighted][is_directed])
                             except KeyError:
-                                sample_space.append(random.sample(data["high_node_range"][str(node_count)][is_weighted][is_directed],1)[0])
+                                sample_space.extend(data["high_node_range"][str(node_count)][is_weighted][is_directed])
                         
                 else:
-                    sample_space.append(data[node_count_type])
+                    try:
+                        sample_space.extend(data[node_count_type][str(node_count)])
+                    except KeyError:
+                        try:
+                            sample_space.extend(data["low_node_range"][str(node_count)])
+                        except KeyError:
+                            try:
+                                sample_space.extend(data["mid_node_range"][str(node_count)])
+                            except KeyError:
+                                sample_space.extend(data["high_node_range"][str(node_count)])
             
             selected_random_samples=random.sample(sample_space,num_samples)
 
@@ -141,8 +149,6 @@ class GraphAlgorithms:
                 example_str += f'example:{cnt},{key_dict[0]}:{input}\n,result:{result}\n,steps:{steps}\n'
 
         return example_str
-    
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -173,3 +179,5 @@ class DisjointSet:
         if self.parent[node] != node:
             self.parent[node] = self.find_U_parent(self.parent[node])
         return self.parent[node]
+
+
