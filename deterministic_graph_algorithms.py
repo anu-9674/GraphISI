@@ -338,10 +338,10 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
 
     def havel_hakimi_algorithm(self):
 
-        degree_sequence = self.degree_sequence
+        degree_sequence = self.degree_sequence.copy()
 
         # if the degree is more than the number of nodes then it is not a graphic sequence
-        if sum(1 for num in degree_sequence if num > len(degree_sequence) - 1):
+        if any(num > len(degree_sequence) - 1 for num in degree_sequence):
             return 0
 
         # if the number of odd degree nodes are odd then it is not a graphic sequence
@@ -351,7 +351,7 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
 
         iteration = 1
         # Havel Hakimi algorithm code
-        while True:
+        while degree_sequence:
 
             iteration_dict = {"degree sequence:": degree_sequence.copy()}
 
@@ -373,11 +373,11 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
 
             # 4.If number of elements in the list are less than the first element then it's not a graphic sequence
             if len(degree_sequence) < ele:
-                iteration_dict['is the sequence length smaller than highest degree ?'] = 'True'
+                iteration_dict['is the sequence length smaller than highest degree ?'] = True
                 self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
                 return 0
             else:
-                iteration_dict['is the sequence length smaller than highest degree?'] = 'False'
+                iteration_dict['is the sequence length smaller than highest degree ?'] = False
 
             # 5.Subtract first element from next v elements
             i = 0
@@ -387,12 +387,12 @@ class HavelHakimiAlgorithm(GraphAlgorithms):
             iteration_dict['modified degree sequence'] = degree_sequence.copy()
 
             # 6.Check if a negative element is encountered after subtraction,if yes return false
-            if degree_sequence[i] < 0:
-                iteration_dict['is there a negative element'] = 'True'
+            if any(x < 0 for x in degree_sequence):
+                iteration_dict['is there a negative element'] = True
                 self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
                 return 0
             else:
-                iteration_dict['is there a negative element'] = 'False'
+                iteration_dict['is there a negative element'] = False
 
             self.algorithm_log[f"Iteration {iteration}"] = iteration_dict
 
