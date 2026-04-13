@@ -49,10 +49,12 @@ class DatasetBuilder:
 
         file_root = "examples_dataset"
         file_path = f"{file_root}/{self.algorithm_name}_data_samples.json"
-        examples = GraphAlgorithms.select_random_samples(file_path,num_nodes=num_nodes,
+        examples = GraphAlgorithms.select_random_samples(file_path,
+                                                        num_nodes=num_nodes,
                                                         num_samples=self.k_shot,
                                                         is_weighted=is_weighted,
                                                         is_directed=is_directed)
+
         in_context_example_str = GraphAlgorithms.create_example_string(examples, ALGORITHM_CONFIG[self.algorithm_type][self.algorithm_name][
             'input_type'])
         
@@ -101,7 +103,9 @@ class DatasetBuilder:
                     for input_index, query in tqdm(input_data.items(), desc="Queries", leave=False):
                         llm_response = self.llm_response_builder(
                             encoded_query_input=query,
-                            in_context_example_str=self.in_context_learning_examples(num_nodes),
+                            in_context_example_str=self.in_context_learning_examples(num_nodes=num_nodes,
+                                                                                    is_weighted=w_key,
+                                                                                    is_directed=d_key),
                             input_type=self.input_type,
                             algorithm_object=self.algorithm_object,
                             model_name=self.model_name
@@ -126,7 +130,7 @@ class DatasetBuilder:
                     for input_index, query in tqdm(input_data.items(), desc="Queries", leave=False):
                         llm_response = self.llm_response_builder(
                             encoded_query_input=query,
-                            in_context_example_str=self.in_context_learning_examples(num_nodes=num_nodes),
+                            in_context_example_str=self.in_context_learning_examples(num_nodes=num_nodes,),
                             input_type=self.input_type,
                             algorithm_object=self.algorithm_object,
                             model_name=self.model_name
@@ -142,4 +146,5 @@ class DatasetBuilder:
             self.write_to_output_file_for_graphs()
         else :
              self.write_to_output_file_for_sequences()
+
 
