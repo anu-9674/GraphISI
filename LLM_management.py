@@ -16,7 +16,7 @@ from langchain_core.prompts import PromptTemplate
 SEED_VALUE = 0
 set_seed(SEED_VALUE)
 
-HuggingFace_token="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"
+HuggingFace_token="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"
 
 class LLMManager:
     """Manages multiple HuggingFace LLM models with configurable settings"""
@@ -46,8 +46,6 @@ class LLMManager:
             dtype: Data type for model weights
             device_map: Device placement strategy
         """
-        if max_memory is None:
-            max_memory = {0: "21GiB", 1: "21GiB", "cpu": "15GiB"}
 
         print(f"Loading model: {model_name} ({model_id})...")
 
