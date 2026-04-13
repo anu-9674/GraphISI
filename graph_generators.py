@@ -79,64 +79,18 @@ def add_weights(G):
 
 def generate_sequences(number_of_sequences: int,
                        algorithm: str,
+                       number_of_nodes,
                        directed: bool,
-                       weighted=False,
-                       number_of_nodes=random.choice(GRAPH_SIZES)):
+                       weighted=False):
     """Generates a list graphical sequences by simpling returning 
         the degree of every node in the generated graph"""
     
     generated_sequences = []
     while number_of_sequences != 0:
 
-        graph = generate_graphs(1, algorithm, weighted, directed, number_of_nodes)[0]
+        graph = generate_graphs(number_of_graphs=1, algorithm=algorithm, weighted=weighted, directed=directed, number_of_nodes=number_of_nodes)[0]
         generated_sequences.append(HavelHakimiAlgorithm.give_degree_sequence(graph))
 
         number_of_sequences -= 1
 
     return generated_sequences
-
-def generate_graphs_n_nodes(
-        number_of_nodes:int,
-        weighted:bool,
-        directed:bool,
-        is_bipartite:bool,
-        input_type:str ):   
-    
-    """Generates and returns a list of all non-isomorpic graphs of a particular number of nodes and 
-        given number of edges starting from n-1 to complex graph, picking only one graph for a particular
-        number of edges.
-        For this purpose we will be using the geng command """
-
-    command=['geng ']
-    if  is_bipartite:
-        command.append("-cb ")
-    else:
-        command.append("-c ")
-    command.append(str(number_of_nodes))
-
-    min_possible_edges=number_of_nodes-1
-    max_possible_edges=(number_of_nodes*(number_of_nodes-1))/2
-    
-    for edge_count in range(min_possible_edges,max_possible_edges+1):
-        graph_List=[]
-
-        command.append(f"{edge_count}:{edge_count}")
-        command.append("| shuf -n 1")
-        
-        results = subprocess.run(command, capture_output=True, text=True)
-        results=results.stdout.strip().split("\n")
-
-        graph=graph = nx.from_graph6_bytes(results[0].encode())
-
-        if directed:
-            graph = graph.to_directed()
-        if weighted:
-            graph = add_weights(graph)
-
-        if input_type == 'graph': graph_List.append(graph)
-        else : graph_List.append(HavelHakimiAlgorithm.give_degree_sequence(graph))
-       
-    return graph_List
-
-    
-
