@@ -11,7 +11,7 @@ from pathlib import Path
 Path("examples_dataset").mkdir(exist_ok=True)
 
 from graph_encoder import weighted_graph_encoder, unweighted_graph_encoder
-import graph_generators
+from graph_generators import generate_graphs,generate_sequences
 from deterministic_graph_algorithms import BFSAlgorithm,DFSAlgorithm,DijkstraAlgorithm, HavelHakimiAlgorithm, \
     KuhnsAlgorithm, KruskalsAlgorithm
 
@@ -58,7 +58,6 @@ class FileBuilder:
                 "input_type": "sequence",
                 "sequence_generators": [
                     {"algorithm": "er", "weighted": False, "directed": False},
-                    {"algorithm": "er", "weighted": False, "directed": True},
                 ],
                 "encoder": lambda x: x,
             },
@@ -107,7 +106,7 @@ class FileBuilder:
                         gen_algorithm, is_weighted, is_directed = generator['algorithm'], generator['weighted'], generator[
                             'directed']
                         
-                        data_input = graph_generators.generate_graphs(1, gen_algorithm, is_weighted, is_directed,number_of_nodes=graph_size)[0]
+                        data_input = generate_graphs(1, gen_algorithm, is_weighted, is_directed,number_of_nodes=graph_size)[0]
 
                         algorithm_instance = algorithm(data_input)
                         data = {'id': example_id, 'Algorithm': algorithm_instance.get_name()}
@@ -144,18 +143,17 @@ class FileBuilder:
                     #for each configuration we will keep 4 examples
                     samples=[]
                     for i in range(4):
-                        gen_algorithm, is_weighted, is_directed = generator['algorithm'], generator['weighted'], generator[
-                            'directed']
+                        gen_algorithm, is_weighted, is_directed = generator['algorithm'], generator['weighted'], generator['directed']
 
-                        data_input = graph_generators.generate_sequences(1, gen_algorithm, is_weighted, is_directed,number_of_nodes=graph_size)[0]
+                        data_input = generate_sequences(1, gen_algorithm,graph_size, is_directed,is_weighted)[0]
                         algorithm_instance = algorithm(data_input)
                         data = {'id': example_id, 'Algorithm': algorithm_instance.get_name()}
 
-                        input_result, input_algorithm_log = algorithm_instance.run()
+                        input_result = algorithm_instance.run()
 
                         data.update({'input_sequence': data_input, 'sequence length': len(data_input),
-                                        'input_sequence_result': input_result,
-                                        'input_sequence_algorithm_log': input_algorithm_log})
+                                        'input_sequence_result': input_result[0],
+                                        'input_sequence_algorithm_log': input_result[1]})
                         samples.append(data)
                         example_id+=1
 
@@ -184,11 +182,10 @@ class FileBuilder:
 def main(args=None):
     """Main fucntion to run the file builder class"""
     algorithms=["bfs","dfs","dijkstra","havel_hakimi","kuhn","kruskal"]
-    print("Generating samples for in-context learning..")
     for algorithm in algorithms:
         fileBuilder_obj=FileBuilder(algorithm)
         fileBuilder_obj.run()
-        print(f"Saved in_context learning examples for {algorithm} algorithm")
+        print(f"Saving in_context learning examples of {algorithm} algorithm")
 
 if __name__ == "__main__":
     main()
