@@ -126,7 +126,7 @@ class DatasetBuilder:
                     for input_index, query in tqdm(input_data.items(), desc="Queries", leave=False):
                         llm_response = self.llm_response_builder(
                             encoded_query_input=query,
-                            in_context_example_str=self.in_context_learning_examples(num_nodes),
+                            in_context_example_str=self.in_context_learning_examples(num_nodes=num_nodes),
                             input_type=self.input_type,
                             algorithm_object=self.algorithm_object,
                             model_name=self.model_name
@@ -142,5 +142,4 @@ class DatasetBuilder:
             self.write_to_output_file_for_graphs()
         else :
              self.write_to_output_file_for_sequences()
-
 
