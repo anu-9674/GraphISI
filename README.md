@@ -9,7 +9,7 @@ python main.py \
   --algorithm bfs \
   --k 1 \
   --model_type Simple \
-  --model_name gemma-3-12b-it \
+  --model_name gemma-3-12b \
   --temperature 0.1 \
   --top_p 0.1 \
   --top_k 10 
