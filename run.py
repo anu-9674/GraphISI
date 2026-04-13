@@ -1,4 +1,4 @@
 import subprocess
-scripts = ["graph_generator.py", "in_context_learning_examples.py", "Query_input_builder.py","LLM_Management.py"]
+scripts = ["graph_generator.py", "in_context_learning_examples.py", "Query_input_builder.py","LLM_management.py"]
 for script in scripts:
     subprocess.run(["python", script])
