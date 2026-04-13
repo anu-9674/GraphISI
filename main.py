@@ -38,7 +38,7 @@ if __name__ == "__main__":
         "--algorithm",
         type=str,
         required=True,
-        choices=["dijkstra", "havel_hakimi", "kuhn", "kruskal",'karger','randomised_mst','online'],
+        choices=["bfs","dfs","dijkstra", "havel_hakimi", "kuhn", "kruskal",'karger','randomised_mst','online_bipartite'],
         help="Algorithm to generate data for"
     )
     parser.add_argument(
