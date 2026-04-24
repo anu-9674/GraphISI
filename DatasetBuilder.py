@@ -18,8 +18,6 @@ class DatasetBuilder:
 
     def __init__(self,algorithm_type,algorithm_name,k_shot,model_cfg,temperature,top_p,top_k):
 
-        # self.output_file = f"Dataset/{algorithm_name}/{algorithm_name}_{k_shot}_.json"
-
         self.output_file = f"Output/{algorithm_name}/{algorithm_name}_{k_shot}_.json"
 
         self.algorithm_name=algorithm_name
