@@ -24,7 +24,7 @@ class DatasetBuilder:
 
         self.algorithm_name=algorithm_name
         self.algorithm_type=algorithm_type
-        self.algorithm_object = ALGORITHM_CONFIG[self.algorithm_type][algorithm_name]['class'](None)
+        self.algorithm_object = ALGORITHM_CONFIG[self.algorithm_type][algorithm_name]['class'](nx.Graph())
         self.weighted_configurations=ALGORITHM_CONFIG[self.algorithm_type][self.algorithm_name]['generator_configurations']['weighted']
         self.directed_configurations=ALGORITHM_CONFIG[self.algorithm_type][self.algorithm_name]['generator_configurations']['directed']
         self.input_type=ALGORITHM_CONFIG[self.algorithm_type][algorithm_name]['input_type']
