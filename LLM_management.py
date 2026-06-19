@@ -7,16 +7,20 @@ from transformers import (
     GenerationConfig,
     AutoTokenizer,
     AutoModelForCausalLM,
-    TextIteratorStreamer
+    TextIteratorStreamer,
+    BitsAndBytesConfig,
+    Mxfp4Config,
 )
+#mport ollama
 # from threading import Thread
 from langchain_core.prompts import PromptTemplate
+from typing import List
 
 # Global seed for reproducibility
 SEED_VALUE = 0
 set_seed(SEED_VALUE)
 
-HuggingFace_token="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"
+
 
 class LLMManager:
     """Manages multiple HuggingFace LLM models with configurable settings"""
@@ -33,7 +37,7 @@ class LLMManager:
             context_length: int = 4096,
             max_memory: dict = None,
             dtype=torch.bfloat16,
-            device_map: str = "auto"
+            #device_map: str = "auto"
     ):
         """
         Load a model and store it with a friendly name
@@ -46,25 +50,38 @@ class LLMManager:
             dtype: Data type for model weights
             device_map: Device placement strategy
         """
-
+        #if max_memory is None:
+            #max_memory = {0: "23GiB", 1: "23GiB", "cpu": "15GiB"} 
         print(f"Loading model: {model_name} ({model_id})...")
+
+        #quantization configuration for loading gpt oss
+        bnb_config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.float16,
+                    #load_in_8bit=True,
+                    #llm_int8_enable_fp32_cpu_offload=True
+        )
 
         # Load config and tokenizer
         config = AutoConfig.from_pretrained(model_id,token=HuggingFace_token)
         config.max_position_embeddings = context_length
-        tokenizer = AutoTokenizer.from_pretrained(model_id, config=config,token=HuggingFace_token)
-
+        tokenizer = AutoTokenizer.from_pretrained(model_id, config=config,token=HuggingFace_token,
+                                                  padding_side='left') #only with the gpt oss model)
 
         # Load model
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            device_map=device_map,
-            max_memory=max_memory,
+            device_map="auto", # earlier it was balanced_low_0 /balanced
+            #max_memory=max_memory,
             torch_dtype=dtype,
             low_cpu_mem_usage=True,
+            #quantization_config=bnb_config, # for loading gpt oss
             token=HuggingFace_token,
         )
 
+        
         # Store references
         self.models[model_name] = model
         self.tokenizers[model_name] = tokenizer
@@ -81,8 +98,10 @@ class LLMManager:
 
 def LLM_response(
         llm_manager: LLMManager,
-        input: str,
-        model_name: str = 'qwen2',
+        input:str="",
+        input_batch: List[str]=[],
+        batch=False,
+        model_name: str = "GPT-OSS-20B",
         system_prompt: str = 'Answer in specified dictionary format specified in the schema,do not restate the algorithm name or the graph structure.Do not output code.',
         # stream: bool = True,
 
@@ -105,7 +124,7 @@ def LLM_response(
     # Get model and tokenizer
     model, tokenizer = llm_manager.get_model(model_name)
 
-    tokenizer.pad_token=tokenizer.eos_token
+    #tokenizer.pad_token=tokenizer.eos_token
 
     # Auto-set do_sample based on temperature
     if do_sample is None:
@@ -186,13 +205,15 @@ def LLM_response(
         top_p=top_p,
         top_k=top_k,
         # repetition_penalty=repetition_penalty,
-        pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
+        #pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
         # eos_token_id=tokenizer.eos_token_id,
-        eos_token_id=[tokenizer.eos_token_id, stop_token_id],
+        #eos_token_id=[tokenizer.eos_token_id, stop_token_id],
         **generation_kwargs,
     )
-
-    response= _generate_response(model, tokenizer, inputs, generation_config, start_time)
+    if not batch:
+        response= _generate_response(model, tokenizer, inputs, generation_config, start_time)
+    else:
+        response=_generate_batch_response(model,tokenizer,input_batch,generation_config,start_time)
     return response
 
 def _generate_response(model, tokenizer, inputs, generation_config, start_time):
@@ -237,6 +258,53 @@ def _generate_response(model, tokenizer, inputs, generation_config, start_time):
 
     return output
 
+def _generate_batch_response(model, tokenizer, batch_prompts, generation_config, start_time):
+    """Generate response one batch at a time"""
+
+
+    print("*****Started*********")
+    start_time=time.time()
+
+    inputs = tokenizer(
+            batch_prompts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True
+        ).to(model.device)
+
+    generated_ids = model.generate(
+            **inputs,
+            generation_config=generation_config
+        )
+
+    batch_outputs = tokenizer.batch_decode(
+        generated_ids,
+        skip_special_tokens=True
+    )
+
+    end_time = time.time()
+    print(f"Total time: {end_time - start_time:.2f}s")
+
+    return batch_outputs
+
+#ollam structure for producing response
+# def produce_response(model_name, Input):
+#     print(type(Input))
+#     system_prompt = 'Answer in specified dictionary format specified in the schema,do not restate the algorithm name or the graph structure.Do not output code.',
+#     # response = ollama.chat(model=model_name, messages=[
+#     #     {"role": "system", "content": system_prompt},
+#     #     {"role": "user", "content": Input}], 
+#     response = ollama.chat(model=model_name, messages=[
+#         {"role": "user", "content": Input}],
+#         stream=True, options={'seed':0, 'temperature':0.2, 'raw': True})
+        
+#     send_back = ''
+#     for chunk in response:
+#         send_back += chunk['message']['content']
+
+#     return send_back
+
+
 def prompt_template(
         example_str: str,
         query_input,  # input can be a sequence or a graph
@@ -250,24 +318,30 @@ def prompt_template(
 
     base_prompt = PromptTemplate.from_template(
         'The task is {task}.\n Algorithm Description :{algorithm}Generate '
-        'the result according to the steps given.Also generate the steps to reach the result according to the givem schema \n Here is the {input} described on'
-        'which the algorithm needs to be applied: {query_input}.')
+        'the result according to the steps given.Also generate the steps to reach the result according to the givem schema given.\n Here is the {input} described on'
+        'which the algorithm needs to be applied: {query_input}.Schema : {schema}')
     prompt = base_prompt.format(task=query_task, algorithm=algorithm_description, input=input_type,
-                                query_input=query_input)
+                                query_input=query_input,schema=schema)
     
     prompt += '' if example_str == '' else f"Here are a few examples {example_str}"
-    prompt=prompt+schema 
 
     return prompt
 
 
 llm_manager = LLMManager()
+# model_cfg={
+#             "model_name": "GPT OSS 20B",
+#             "model_id":"./gptoss20b_bf16",
+#             "type":"Dense",
+#             "context_window":12800
+#         }
 model_cfg={
             "model_name": "Gemma 3 12B",
             "model_id": "google/gemma-3-12b-it",
             "type": "Dense",
             "context_window": 128000 
         }
+        
 llm_manager.load_model(
             model_name=model_cfg["model_name"],
             model_id=model_cfg["model_id"],
