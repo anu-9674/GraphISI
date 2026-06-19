@@ -4,15 +4,18 @@ K examples from the file for k-shot prompting
 """
 import os
 import json
-import LLM_management
+import LLM_management3 as LLM_management
 from collections import defaultdict
 from GraphAlgorithms import GraphAlgorithms
 from ALGORITHM_CONFIG import ALGORITHM_CONFIG , is_weighted,is_directed
 from tqdm import tqdm
 from GraphAlgorithms import GraphAlgorithms
+from itertools import batched
 
 with open('model_registry.json', 'r') as f:
     MODEL_REGISTRY = json.load(f)
+
+batch_size=2
 
 class DatasetBuilder:
 
@@ -77,6 +80,44 @@ class DatasetBuilder:
 
         return llm_output
 
+    def batch_prompt_builder(self,inputs,input_type:str,algorithm_object:GraphAlgorithms,input_info:str):  #add the input info in the generte batch fucntion
+        """Builds the prompts for a batch and then returns an array containing all the prompts for batch inferencing"""
+
+        prompt_batch=[]
+        for input_id,input in inputs:
+            in_context_example_str=self.in_context_learning_examples(num_nodes=input_info["num_nodes"],
+                                                                                is_weighted=input_info["w_key"],
+                                                                                is_directed=input_info["d_key"])
+            prompt=LLM_management.prompt_template(in_context_example_str, input,
+                                                algorithm_object.get_task(),
+                                                algorithm_object.get_algorithm_steps(), algorithm_object.get_schema(),
+                                                input_type)
+            prompt_batch.append(prompt)
+
+        return prompt_batch
+
+    def batch_llm_response_builder(self,inputs,input_info):
+        """Takes in a batch of prompts and returns a dictionary containing the llm response to the prompt of a specified input id"""
+
+        batch_prompts=self.batch_prompt_builder(inputs,self.input_type,self.algorithm_object,input_info)
+        batch_llm_response=LLM_management.LLM_response(
+                                   llm_manager=self.llm_manager,
+                                   model_name=self.model_name,
+                                   input_batch=batch_prompts,
+                                   top_p=self.top_p,
+                                   top_k=self.top_k,
+                                   temperature=self.temperature,
+                                   batch=True)
+        
+        batch_output=dict.fromkeys([row[0] for row in inputs])
+        index=0
+
+        for input_id in batch_output.keys():
+            batch_output[input_id]=batch_llm_response[index]
+            index+=1
+
+        return batch_output
+
 
     def write_to_output_file_for_graphs(self):
         """Read the inputs from the file and then records the model responses"""
@@ -109,9 +150,40 @@ class DatasetBuilder:
                             model_name=self.model_name
                         )
                         data[num_nodes][w_key][d_key][self.model_name][input_index] = llm_response
-            if cnt%10 == 0 or cnt+1 == len(data):    
-                with open(f"{self.output_file}_{self.model_name}","w") as f:
-                    json.dump(data,f)
+                    if cnt%10 == 0 or cnt+1 == len(data):    
+                        with open(f"{self.output_file}_{self.model_name}","w") as f:
+                            json.dump(data,f)
+
+    def write_to_output_file_for_graphs_batch(self):
+
+        data={}
+        with open(self.output_file,"r") as f:
+            data=json.load(f)
+
+        for cnt,num_nodes in enumerate(data):
+             print(f"------Processing {self.algorithm_name} at {cnt+1}/{len(data)}-----")
+             for weighted in self.weighted_configurations:
+                w_key=is_weighted[weighted]
+                for directed in self.directed_configurations:
+                    d_key=is_directed[directed]
+
+                    if self.model_name not in data[num_nodes][w_key][d_key]:
+                        data[num_nodes][w_key][d_key][self.model_name] = {}
+           
+                    input_data = data[num_nodes][w_key][d_key]['input']
+                    
+                    for input_batch in batched(input_data.items(), batch_size):
+                        input_information={"num_nodes":num_nodes,"w_key":w_key,"d_key":d_key}
+                        batch_output=self.batch_llm_response_builder(inputs=input_batch,
+                                                                       input_info=input_information)
+
+                        for input_id,llm_response in batch_output.items():
+                                data[num_nodes][w_key][d_key][self.model_name][input_id] = llm_response
+                                
+                        #where to put this writing in the file line
+                        with open(f"{self.output_file}_{self.model_name}","w") as f:
+                            json.dump(data,f)
+
 
     def write_to_output_file_for_sequences(self):
         data={}
@@ -141,8 +213,6 @@ class DatasetBuilder:
     
     def run(self):
         if self.algorithm_name!= 'havel_hakimi':
-            self.write_to_output_file_for_graphs()
+            self.write_to_output_file_for_graphs_batch()
         else :
              self.write_to_output_file_for_sequences()
-
-
